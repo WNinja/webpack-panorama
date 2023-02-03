@@ -10,6 +10,7 @@ import {
   preserveIncludesAfter,
   preserveIncludesBefore,
   validateIncludes,
+  AddCommonStyles,
 } from './posthtml-plugin-panorama-includes';
 
 export interface PostHTMLLoaderMeta {
@@ -43,6 +44,13 @@ export default async function layoutLoader(
 
     banTextNodes(this),
   ];
+
+  if (options.common_styles) {
+    const files = (options.common_styles as unknown as string[]).map(s => {
+      return path.resolve(this.rootContext, s);
+    });
+    plugins.unshift(AddCommonStyles(files));
+  }
 
   try {
     // 处理导入css写到xml中
