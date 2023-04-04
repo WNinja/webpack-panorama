@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { interpolateName } from 'loader-utils';
 import path from 'path';
 import webpack from 'webpack';
@@ -14,6 +15,11 @@ export function pitch(this: LoaderContext) {
 
   this.cacheable(options.cacheable ?? false);
   this.addDependency(this.resourcePath);
+
+  let list = resolveImport({}, this.resourcePath, true);
+  for (const sPath of Object.keys(list)) {
+    this.addDependency(sPath);
+  }
 
   const filenameTemplate = options.filename ?? '[path][name].js';
   const filename = interpolateName(this, filenameTemplate, { context: this.rootContext });
@@ -56,4 +62,37 @@ function createCompiler(
   new webpack.EntryPlugin(loader.context, rawRequest, 'main').apply(childCompiler);
 
   return childCompiler;
+}
+
+function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot = false) {
+  let tTry = bRoot ? [scriptPath] : [
+    scriptPath + ".tsx",
+    scriptPath + ".ts",
+    scriptPath + "/index.tsx",
+    scriptPath + "/index.ts",
+  ];
+
+  tTry.some((sPath) => {
+    if (fs.existsSync(sPath)) {
+      bRoot == false && (list[sPath] = true);
+
+      const content = fs.readFileSync(sPath, "utf-8");
+      const sDir = path.dirname(sPath);
+      const importList = content.match(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g)?.map((relativePath) => {
+        return relativePath.replace(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g, "$2");
+      })?.map((relativePath) => {
+        return path.resolve(sDir, relativePath);
+      });
+      if (importList) {
+        importList.forEach(element => {
+          if (element.search(/.*.less/) == -1) {
+            resolveImport(list, element);
+          }
+        });
+      }
+
+      return true;
+    }
+  });
+  return list;
 }
