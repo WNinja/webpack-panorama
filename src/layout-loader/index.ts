@@ -110,7 +110,7 @@ function resolveImport(layoutPath: string, importPath: string) {
   });
   if (importList) {
     importList.forEach(element => {
-      if (element.search(/.*.less/) != -1) {
+      if (element.search(/.*\.less('|")/) != -1) {
         list[element] = true;
       } else {
         let exists = fs.existsSync(element + ".tsx");
