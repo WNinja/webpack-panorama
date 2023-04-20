@@ -85,7 +85,7 @@ function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot 
       });
       if (importList) {
         importList.forEach(element => {
-          if (element.search(/.*.less/) == -1) {
+          if (element.search(/.*\.less('|")/) == -1) {
             resolveImport(list, element);
           }
         });
