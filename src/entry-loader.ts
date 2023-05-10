@@ -74,6 +74,7 @@ function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot 
 
   tTry.some((sPath) => {
     if (fs.existsSync(sPath)) {
+      if (list[sPath]) return true;
       bRoot == false && (list[sPath] = true);
 
       const content = fs.readFileSync(sPath, "utf-8");
