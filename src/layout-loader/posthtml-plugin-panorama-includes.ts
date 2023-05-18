@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import posthtml from 'posthtml';
 import { LoaderContext } from '../webpack-loader-api';
 
@@ -74,4 +76,90 @@ export const validateIncludes = (context: LoaderContext): posthtml.Plugin => (tr
       }
     }
   }
+};
+
+export function IncludeDota2Snippet(_this: LoaderContext) {
+  function GetAllSnippet(TS_List: Record<string, boolean>, Snippets: Record<string, boolean>, scriptPath: string, bSuffix = false) {
+    let tTry = bSuffix ? [scriptPath] : [
+      scriptPath + ".tsx",
+      scriptPath + ".ts",
+      scriptPath + "/index.tsx",
+      scriptPath + "/index.ts",
+    ];
+    // 判断以上任一情况的文件是否存在
+    tTry.some((sPath) => {
+      if (fs.existsSync(sPath)) {
+        if (TS_List[sPath]) return true;
+        TS_List[sPath] = true;
+
+        const content = fs.readFileSync(sPath, "utf-8");
+        const sDir = path.dirname(sPath);
+        // 读取文件内import的所有文件
+        const importList = content.match(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g)?.map((relativePath) => {
+          return relativePath.replace(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g, "$2");
+        })?.map((relativePath) => {
+          return path.resolve(sDir, relativePath);
+        });
+        if (importList) {
+          importList.forEach(element => {
+            // 不是.less
+            if (element.search(/.*\.less/) == -1) {
+              // 记录snnipet文件
+              if (element.search(/\.s\.xml/) != -1) {
+                Snippets[element] = true;
+              } else { // 递归查找import的其他ts文件
+                GetAllSnippet(TS_List, Snippets, element);
+              }
+            }
+          });
+        }
+
+        return true;
+      }
+    });
+    return Snippets;
+  }
+
+  return (tree: posthtml.Api) => {
+    let TS_List = {};
+    let Snippets = {};
+    let rootContent = getRoot(tree)?.content ?? [];
+    rootContent.filter(createNodeFilter(['scripts']))
+      .flatMap((x) => x.content)
+      .filter(createNodeFilter(['include']))
+      .forEach((node) => {
+        let src = node.attrs.src;
+        if (typeof src == "string" && src.search(/.*\.(tsx|ts)/) != -1) {
+          const sPath = path.resolve(_this.context, src);
+          GetAllSnippet(TS_List, Snippets, sPath, true);
+        }
+      });
+
+    if (Object.keys(Snippets).length <= 0) {
+      return;
+    }
+
+    let _Node_Snippets: posthtml.NodeTreeElement = false;
+    for (const node of rootContent) {
+      if (typeof node == "object" && node.tag == "snippets") {
+        _Node_Snippets = node;
+      }
+    }
+    if (!(typeof _Node_Snippets == "object" && _Node_Snippets.tag == "snippets")) {
+      _Node_Snippets = {
+        tag: "snippets",
+        attrs: {},
+        content: []
+      };
+      rootContent.unshift("\n\t", _Node_Snippets);
+    }
+
+    let Node_Snippets = _Node_Snippets;
+    Object.keys(Snippets).forEach((sPath) => {
+      if (fs.existsSync(sPath)) {
+        Node_Snippets.content.push("\n\t\t", fs.readFileSync(sPath, "utf-8").replace(/\n/g, "\n\t\t"));
+      };
+    });
+    Node_Snippets.content.push("\n\t");
+  };
 };

@@ -1,16 +1,17 @@
-import posthtml from 'posthtml';
 import { imports, urls } from '@posthtml/esm';
-import webpack from 'webpack';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import posthtml from 'posthtml';
+import webpack from 'webpack';
 import { LoaderContext } from '../webpack-loader-api';
 import { banTextNodes } from './posthtml-plugin-ban-text-nodes';
 import { loadImports } from './posthtml-plugin-load-imports';
 import {
+  AddCommonStyles,
+  IncludeDota2Snippet,
   preserveIncludesAfter,
   preserveIncludesBefore,
   validateIncludes,
-  AddCommonStyles,
 } from './posthtml-plugin-panorama-includes';
 
 export interface PostHTMLLoaderMeta {
@@ -34,6 +35,7 @@ export default async function layoutLoader(
   const callback = this.async()!;
 
   const plugins: posthtml.Plugin[] = [
+    IncludeDota2Snippet(this),
     preserveIncludesBefore,
     urls(),
     imports(),
