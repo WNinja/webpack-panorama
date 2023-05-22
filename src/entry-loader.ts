@@ -77,8 +77,7 @@ function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot 
       if (list[sPath]) return true;
       bRoot == false && (list[sPath] = true);
 
-      // 读取TS文件并移除所有的注释
-      let content = fs.readFileSync(sPath, "utf-8").replace(/(\/\/.*\n)|(\/\*[\s\S]*\*\/)/g, "");
+      let content = fs.readFileSync(sPath, "utf-8");
       const sDir = path.dirname(sPath);
       const importList = content.match(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g)?.map((relativePath) => {
         return relativePath.replace(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g, "$2");
