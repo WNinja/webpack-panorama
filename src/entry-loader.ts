@@ -77,7 +77,8 @@ function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot 
       if (list[sPath]) return true;
       bRoot == false && (list[sPath] = true);
 
-      const content = fs.readFileSync(sPath, "utf-8");
+      // 读取TS文件并移除所有的注释
+      let content = fs.readFileSync(sPath, "utf-8").replace(/(\/\/.*\n)|(\/\*[\s\S]*\*\/)/g, "");
       const sDir = path.dirname(sPath);
       const importList = content.match(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g)?.map((relativePath) => {
         return relativePath.replace(/import.*('|")(\.\.\/.*|\.\/.*)('|");/g, "$2");
@@ -86,8 +87,12 @@ function resolveImport(list: Record<string, boolean>, scriptPath: string, bRoot 
       });
       if (importList) {
         importList.forEach(element => {
-          if (element.search(/.*(\.less|\.s\.xml)/) == -1) {
-            resolveImport(list, element);
+          if (element.search(/.*(\.less)/) == -1) {
+            if (element.search(/.*(\.s\.xml)/) == -1) {
+              resolveImport(list, element);
+            } else {
+              list[element] = true;
+            }
           }
         });
       }

@@ -155,11 +155,23 @@ export function IncludeDota2Snippet(_this: LoaderContext) {
     }
 
     let Node_Snippets = _Node_Snippets;
-    Object.keys(Snippets).forEach((sPath) => {
+    Object.keys(Snippets).forEach((sPath, index) => {
       if (fs.existsSync(sPath)) {
-        Node_Snippets.content.push("\n\t\t", fs.readFileSync(sPath, "utf-8").replace(/\n/g, "\n\t\t"));
+        if (index == 0) {
+          Node_Snippets.content.push("\t");
+        } else {
+          Node_Snippets.content.push("\n\t\t");
+        }
+        const snippet = posthtml().process(fs.readFileSync(sPath, "utf-8").replace(/\n/g, "\n\t\t"), {
+          closingSingleTag: 'slash',
+          xmlMode: true,
+          sync: true,
+        }).tree;
+        Node_Snippets.content.push(snippet[0]);
       };
     });
     Node_Snippets.content.push("\n\t");
+
+    return;
   };
 };
