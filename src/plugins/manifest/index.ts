@@ -18,7 +18,7 @@ export { ManifestEntry, ManifestEntryType, manifestSchema } from './manifest';
 export const manifestTemplatePath = path.resolve(__dirname, '../../../manifest-template.ejs');
 
 class PanoramaEntryDependency extends ModuleDependency {
-  // @ts-expect-error 'type' is defined as a property in class 'ModuleDependency', but is overridden here in 'PanoramaEntryDependency' as an accessor.
+  // 111@ts-expect-error 'type' is defined as a property in class 'ModuleDependency', but is overridden here in 'PanoramaEntryDependency' as an accessor.
   public get type() {
     return 'panorama entry';
   }
