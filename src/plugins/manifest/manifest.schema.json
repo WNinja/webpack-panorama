@@ -16,6 +16,7 @@
         "enum": [
           "GameSetup",
           "HeroSelection",
+          "PregameStrategy",
           "Hud",
           "HudTopBar",
           "FlyoutScoreboard",

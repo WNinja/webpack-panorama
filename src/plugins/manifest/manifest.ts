@@ -31,6 +31,7 @@ export interface ManifestEntry {
 export type ManifestEntryType =
   | 'GameSetup'
   | 'HeroSelection'
+  | 'PregameStrategy'
   | 'Hud'
   | 'HudTopBar'
   | 'FlyoutScoreboard'

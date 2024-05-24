@@ -155,13 +155,9 @@ export function IncludeDota2Snippet(_this: LoaderContext) {
     }
 
     let Node_Snippets = _Node_Snippets;
-    Object.keys(Snippets).forEach((sPath, index) => {
+    Object.keys(Snippets).forEach((sPath) => {
       if (fs.existsSync(sPath)) {
-        if (index == 0) {
-          Node_Snippets.content.push("\t");
-        } else {
-          Node_Snippets.content.push("\n\t\t");
-        }
+        Node_Snippets.content.push("\n\t\t");
         const snippet = posthtml().process(fs.readFileSync(sPath, "utf-8").replace(/\n/g, "\n\t\t"), {
           closingSingleTag: 'slash',
           xmlMode: true,

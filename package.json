@@ -1,15 +1,15 @@
 {
-  "name": "@demon673/webpack-panorama",
-  "version": "0.4.5",
+  "name": "@wninja/webpack-panorama",
+  "version": "0.0.1",
   "description": "Utilities for using webpack with Valve's Panorama UI (for Dota 2 Custom Games).",
   "keywords": [
     "dota",
     "panorama",
     "webpack"
   ],
-  "repository": "https://github.com/Demon673/webpack-panorama",
+  "repository": "https://github.com/WNinja/webpack-panorama",
   "license": "MIT",
-  "author": "Demon673",
+  "author": "WNinja",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -41,7 +41,7 @@
     "@posthtml/esm": "^1.0.0",
     "html-webpack-plugin": "^5.5.0",
     "js-yaml": "^4.1.0",
-    "loader-utils": "^3.2.0",
+    "loader-utils": "^3.2.1",
     "lodash": "^4.17.21",
     "posthtml": "^0.16.5",
     "schema-utils": "^4.0.0"
@@ -58,7 +58,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
     "typescript": "^4.5.4",
-    "webpack": "^5.65.0"
+    "webpack": "5.65.0"
   },
   "peerDependencies": {
     "webpack": "^5.65.0"
