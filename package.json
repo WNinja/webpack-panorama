@@ -1,6 +1,6 @@
 {
   "name": "@wninja/webpack-panorama",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Utilities for using webpack with Valve's Panorama UI (for Dota 2 Custom Games).",
   "keywords": [
     "dota",
